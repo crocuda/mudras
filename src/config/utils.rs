@@ -53,6 +53,7 @@ pub fn bind_to_keys(
     let mut sequence = vec![];
 
     for key in keys {
+        // TODO: kebab casing
         let keycode = match &*key.to_lowercase() {
             "escape" => evdev::KeyCode::KEY_ESC,
 
@@ -121,7 +122,16 @@ pub fn bind_to_keys(
             "m" => evdev::KeyCode::KEY_M,
 
             "brightness_up" => evdev::KeyCode::KEY_BRIGHTNESSUP,
+            "xf86monbrightnessup" => evdev::KeyCode::KEY_BRIGHTNESSUP,
             "brightness_down" => evdev::KeyCode::KEY_BRIGHTNESSDOWN,
+            "xf86monbrightnessdown" => evdev::KeyCode::KEY_BRIGHTNESSDOWN,
+
+            "volume_up" => evdev::KeyCode::KEY_VOLUMEUP,
+            "xf86audioraisevolume" => evdev::KeyCode::KEY_VOLUMEUP,
+            "volume_down" => evdev::KeyCode::KEY_VOLUMEDOWN,
+            "xf86audiolowervolume" => evdev::KeyCode::KEY_VOLUMEDOWN,
+            "mute" => evdev::KeyCode::KEY_MUTE,
+            "xf86audiomute" => evdev::KeyCode::KEY_MUTE,
 
             _ => evdev::KeyCode::KEY_RESERVED,
         };

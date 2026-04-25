@@ -1,23 +1,24 @@
 # Mudras: A hotkey daemon for elite shinobi.
 
-_A tool for keyboards shortcuts
-that gives me enough rope to shoot yourself in the foot._
+_A tool for great keyboards shortcuts (on_press, on_release, and submaps 😉)._
+_Mudras gives you enough rope to shoot yourself in the foot._
 
-It executes commands when a key combination is matched.
+All that script does is executing commands whenever a key combination is matched.
 
 ## Configuration
 
-A single configuration file in **kdl** at `~/.config/mudras/config.kdl`
+Mudras needs a single configuration file in **kdl** file format
+at `~/.config/mudras/config.kdl`.
 
-### Set up a bind (or hotkey, or binding).
+### Set up a bind (hotkey/binding).
 
-- Set up a binding as a sequence of keys separated by `+`.
+- A bind is a sequence of keys separated by `+`:
 
-```kdl
-Super+Enter
-```
+  ```kdl
+  Super+Enter
+  ```
 
-- You can attach commands on key **press** and/or key **release**.
+- You can attach commands on key **press** and/or on key **release**.
 
 ```kdl
 Super+Enter {
@@ -92,6 +93,15 @@ Super {
   }
 }
 
+```
+
+## Special keys
+
+```kdl
+volume_up == xf86AudioRaiseVolume
+volume_down == xf86AudioLowerVolume
+brightness_up == xf86MonBrightnessUp
+brightness_down == f86MonBrightnessDown
 ```
 
 ### Ignore some bind on multiple key release (bug fix).
