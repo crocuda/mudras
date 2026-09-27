@@ -1,16 +1,27 @@
-{pkgs ? import <nixpkgs> {}}:
-pkgs.mkShell {
-  buildInputs = with pkgs.buildPackages; [
-    openssl
-    pkg-config
+{lib, ...}: {
+  flake-file.inputs = {
+    rust-overlay.url = "github:oxalica/rust-overlay";
+  };
+  systems = lib.mkDefault lib.systems.flakeExposed;
+  perSystem = {
+    pkgs,
+    system,
+    ...
+  }: {
+    devShells.default = lib.mkDefault (pkgs.mkShell {
+      buildInputs = with pkgs.buildPackages; [
+        openssl
+        pkg-config
 
-    # libs
-    udev
+        # libs
+        udev
 
-    libinput
-    libxkbcommon
+        libinput
+        libxkbcommon
 
-    (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
-    # rust-analyzer
-  ];
+        (rust-bin.fromRustupToolchainFile ../../rust-toolchain.toml)
+        # rust-analyzer
+      ];
+    });
+  };
 }

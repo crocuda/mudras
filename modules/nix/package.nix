@@ -1,40 +1,59 @@
 {
-  pkgs ? import <nixpkgs> {},
   lib,
+  inputs,
+  self,
   ...
-}:
-pkgs.rustPlatform.buildRustPackage rec {
-  pname = "mudras";
-  version = (builtins.fromTOML (lib.readFile ./Cargo.toml)).package.version;
-
-  src = ./.;
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    # outputHashes = {
-    #   "tappers-0.4.2" = "sha256-kx/gLngL7+fH5JmJTVTGawyNdRde59dbFdrzermy/CE=";
-    # };
+}: {
+  flake-file.inputs = {
+    rust-overlay.url = "github:oxalica/rust-overlay";
   };
+  systems = lib.mkDefault lib.systems.flakeExposed;
+  perSystem = {
+    pkgs,
+    system,
+    ...
+  }: {
+    _module.args.pkgs = import self.inputs.nixpkgs {
+      inherit system;
+      overlays = [inputs.rust-overlay.overlays.default];
+    };
+    packages = rec {
+      default = mudras;
+      mudras = pkgs.rustPlatform.buildRustPackage rec {
+        pname = "mudras";
+        version = (builtins.fromTOML (lib.readFile ../../Cargo.toml)).package.version;
 
-  # disable tests
-  checkType = "debug";
-  doCheck = false;
+        src = ../../.;
+        cargoLock = {
+          lockFile = ../../Cargo.lock;
+          # outputHashes = {
+          #   "tappers-0.4.2" = "sha256-kx/gLngL7+fH5JmJTVTGawyNdRde59dbFdrzermy/CE=";
+          # };
+        };
 
-  nativeBuildInputs = with pkgs; [
-    installShellFiles
-    pkg-config
+        # disable tests
+        checkType = "debug";
+        doCheck = false;
 
-    # llvmPackages.clang
-    # clang
-  ];
-  buildInputs = with pkgs; [
-    openssl
-    pkg-config
+        nativeBuildInputs = with pkgs; [
+          installShellFiles
+          pkg-config
 
-    # libs
-    udev
+          # llvmPackages.clang
+          # clang
+        ];
+        buildInputs = with pkgs; [
+          openssl
+          pkg-config
 
-    # rust vmm uses latest stable and oxalica tend to lag behind.break
-    # so we temporary force use of beta.
-    (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
-  ];
+          # libs
+          udev
+
+          # rust vmm uses latest stable and oxalica tend to lag behind.break
+          # so we temporary force use of beta.
+          (rust-bin.fromRustupToolchainFile ../../rust-toolchain.toml)
+        ];
+      };
+    };
+  };
 }

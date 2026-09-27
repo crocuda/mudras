@@ -5,6 +5,23 @@
 
   mudras.aspects = rec {
     default = mudras;
+
+    ## Add Users to admin groups.
+    policies.to-host = {user, ...}: {
+      nixos = {...}: {
+        users.groups = {
+          input.members = [];
+        };
+        users.users.${user.userName} = {
+          extraGroups = [
+            "input"
+          ];
+        };
+      };
+    };
+    includes = [
+      mudras.policies.to-host
+    ];
     mudras = {
       nixos = {...}: {
         imports = [
@@ -25,8 +42,8 @@
     }: {
       ###################################
       ## Options definition
-      options.services."virshle" = with lib; {
-        enable = mkEnableOption "Enable virshle.";
+      options.services."mudras" = with lib; {
+        enable = mkEnableOption "Enable mudras.";
         logLevel = mkOption {
           default = "info";
           type = types.enum ["error" "warn" "info" "debug" "trace"];
@@ -39,10 +56,13 @@
       in
         mkIf config.services."mudras".enable {
           ## Working dir
-          # systemd.tmpfiles.rules = lib.mkDefault [
-          #   "d '/var/lib/udev' 2774 ${cfg.user} users - -"
-          #   "Z '/var/lib/udev' 2774 ${cfg.user} users - -"
-          # ];
+          systemd.tmpfiles.rules = lib.mkDefault [
+            "d '/var/lib/udev' 2774 root input - -"
+            "Z '/var/lib/udev' 2774 root input - -"
+
+            "z /dev/input 0775 root input - -"
+            "z /dev/uinput 0660 root input - -"
+          ];
 
           systemd.services.mudras = {
             enable = true;
@@ -50,47 +70,47 @@
             documentation = [
               # "https://github.com/crocuda/mudras"
             ];
-            after = [
-              "socket.target"
+            wantedBy = mkDefault [
+              "niri.service"
             ];
-            # wantedBy = ["multi-user.target"];
-            serviceConfig = {
+            serviceConfig = let
+              verbosity =
+                {
+                  "error" = "";
+                  "warn" = "-v";
+                  "info" = "-vv";
+                  "debug" = "-vvv";
+                  "trace" = "-vvvv";
+                }.${
+                  config.services."mudras".logLevel
+                };
+            in {
               Type = "simple";
               User = "root";
               Group = "users";
               Environment = "PATH=/run/current-system/sw/bin";
               ExecStart = ''
-                ${package}/bin/mudras tui serve -vvv
+                ${package}/bin/mudras run ${verbosity}
               '';
-              WorkingDirectory = "/var/lib/crotui";
+              WorkingDirectory = "/var/lib/mudras";
               # StandardInput = "null";
               StandardOutput = "journal+console";
               StandardError = "journal+console";
 
-              AmbientCapabilities = [
-                "CAP_NET_BIND_SERVICE"
-                # "CAP_SET_PROC"
-                # "CAP_SYS_ADMIN"
-                # "CAP_NET_ADMIN"
-              ];
+              AmbientCapabilities = [];
             };
           };
 
-          # Prepend tui configuration to configuration file
+          # Prepend some configuration to configuration file
           environment.etc = {
-            "crotui/config.toml".text = mkMerge [
+            "mudras/config.yml".text = mkMerge [
               (mkBefore (inputs.nix-std.lib.serde.toTOML {
-                tui = {
-                  address = cfg.address;
-                  port = cfg.port;
-                };
-              }))
-              (cfg.extraConfig)
+                  }))
+              (config.services."mudras".extraConfig)
             ];
           };
 
           environment.systemPackages = [
-            # Network manager
             package
           ];
         };
