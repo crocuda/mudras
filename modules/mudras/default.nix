@@ -1,11 +1,21 @@
-{self, ...}: {
+{
+  self,
+  den,
+  ...
+}: {
   flake-file.inputs = {
     # den.url = "github:denful/den";
   };
 
   mudras.aspects = rec {
     default = mudras;
-
+    mudras = {
+      nixos = {...}: {
+        imports = [
+          self.nixosModules.mudras
+        ];
+      };
+    };
     ## Add Users to admin groups.
     policies.to-host = {user, ...}: {
       nixos = {...}: {
@@ -21,14 +31,10 @@
     };
     includes = [
       mudras.policies.to-host
+      (den.batteries.unfree [
+        "via"
+      ])
     ];
-    mudras = {
-      nixos = {...}: {
-        imports = [
-          self.nixosModules.mudras
-        ];
-      };
-    };
   };
 
   flake.nixosModules = rec {
@@ -60,6 +66,9 @@
             "d '/var/lib/udev' 2774 root input - -"
             "Z '/var/lib/udev' 2774 root input - -"
 
+            # Mudras/Swhkd
+            # No longer need to be root.
+            # Members of the **input** group can interact with keyboard.
             "z /dev/input 0775 root input - -"
             "z /dev/uinput 0660 root input - -"
           ];
@@ -70,7 +79,7 @@
             documentation = [
               # "https://github.com/crocuda/mudras"
             ];
-            wantedBy = mkDefault [
+            wantedBy = [
               "niri.service"
             ];
             serviceConfig = let
@@ -112,6 +121,8 @@
 
           environment.systemPackages = [
             package
+            ## Keyboard utils
+            wev
           ];
         };
     };

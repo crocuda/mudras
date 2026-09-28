@@ -19,8 +19,8 @@
     # Taken from denful/den source code at "nix/flakeModule.nix".
     flakeModule = flakeModules.default;
     flakeModules = rec {
-      default = virshle;
-      virshle = {
+      default = mudras;
+      mudras = {
         imports =
           builtins.filter (p:
             lib.hasSuffix ".nix" p && !lib.hasInfix "/_" p)
