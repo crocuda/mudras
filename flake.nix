@@ -11,6 +11,7 @@
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     import-tree.url = "github:denful/import-tree";
+    nix-std.url = "github:chessai/nix-std";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };

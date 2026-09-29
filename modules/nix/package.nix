@@ -22,7 +22,6 @@
       mudras = pkgs.rustPlatform.buildRustPackage rec {
         pname = "mudras";
         version = (builtins.fromTOML (lib.readFile ../../Cargo.toml)).package.version;
-
         src = ../../.;
         cargoLock = {
           lockFile = ../../Cargo.lock;
