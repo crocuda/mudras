@@ -39,11 +39,11 @@ impl Server {
             .filter(|(_path, device)| utils::check_device_is_pointer(device))
             .collect();
 
-        debug!("creating virtual devices.");
         // Apparently, having a single uinput device with keys, relative axes and switches
         // prevents some libraries to listen to these events. The easy fix is to have separate
         // virtual devices, one for keys and relative axes (`uinput_device`) and another one
         // just for switches (`uinput_switches_device`).
+        debug!("Creating virtual devices.");
         let mut virtual_keyboard = virtuals::create_keyboard()?;
         let mut virtual_pointer = virtuals::create_pointer()?;
         let mut virtual_switch = virtuals::create_switch()?;
@@ -84,7 +84,7 @@ impl Server {
                             };
                             match key_state {
                                 KeyState::Pressed | KeyState::Released => {
-                                    // trace!("key={:#?},state={:#?}", keycode, state);
+                                    trace!("key={:#?},state={:#?}", keycode, key_state);
 
                                     if let Some(keyboard_state) = keyboard_states.get_mut(&path) {
                                         // Update keyboard representation state.

@@ -93,6 +93,8 @@ pub fn trigger_action(
     // trace!("{:#?}", keyboard_sequence);
     // A bind sequence is matched against the current keyboard sequence
     if let Some(bind_args) = submap.binds.get(&keyboard_sequence) {
+        trace!("keybind detected: {:#?}", keyboard_sequence);
+
         // Extra step for release keys
         match key_state {
             KeyState::Released => {
@@ -108,8 +110,17 @@ pub fn trigger_action(
         for cmd in &bind_args.commands {
             match cmd {
                 Command::Sh(stdin) => {
-                    let mut p = Process::new().stdin(&stdin).term().background().to_owned();
-                    let _ = p.run();
+                    trace!("action(sh): {:#?}", cmd);
+
+                    let mut p = Process::new()
+                        .stdin(&stdin)
+                        .term()
+                        .background()
+                        // .orphan()
+                        .to_owned();
+                    // let res = p.run()?;
+                    let res = p.run();
+                    trace!("action result(sh): {:#?}", res);
                 }
                 Command::Internal(e) => match e {
                     Keyword::Enter(submap_name) => {

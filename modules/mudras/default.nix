@@ -11,7 +11,7 @@
 
   mudras.aspects.default = {
     includes = [
-      # mudras.aspects.default.policies.to-host
+      mudras.aspects.default.policies.to-host
     ];
     ## Add Users to admin groups.
     policies.to-host = {
@@ -34,7 +34,10 @@
       imports = [
         self.nixosModules.default
       ];
-      services.mudras.enable = true;
+      services.mudras = {
+        enable = true;
+        logLevel = "trace";
+      };
     };
     homeManager = {...}: {
       imports = [
@@ -122,6 +125,10 @@
               documentation = [
                 # "https://github.com/crocuda/mudras"
               ];
+              after = [
+                # "graphical-session.target"
+                "niri.service"
+              ];
               wantedBy = [
                 "niri.service"
               ];
@@ -138,13 +145,19 @@
                   };
               in {
                 Type = "simple";
+                KillMode = "process";
                 # User = "root";
                 # Group = "input";
-                Environment = "PATH=/run/current-system/sw/bin";
-                ExecStart = ''
-                  ${package}/bin/mudras run ${verbosity}
-                '';
-                WorkingDirectory = "/var/lib/mudras";
+                ExecStart = let
+                  name = "mudras-env-wrapper";
+                  text = ''
+                    set -e
+                    PATH="/run/wrappers/bin:$HOME/.cargo/bin:$HOME/.bun/bin:/run/current-system/sw/bin:/nix/profile/bin:$HOME/.nix-profile/bin:$PATH"
+                    ${package}/bin/mudras run ${verbosity}
+                  '';
+                  script = pkgs.writeShellScriptBin name text;
+                in "${script}/bin/${name}";
+                # WorkingDirectory = "/var/lib/mudras";
                 # StandardInput = "null";
                 # StandardOutput = "journal+console";
                 # StandardError = "journal+console";
