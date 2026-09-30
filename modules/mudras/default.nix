@@ -41,7 +41,7 @@
 
   flake = {
     hmModules = rec {
-      default = mudras;
+      # default = mudras;
       mudras = {
         lib,
         config,
@@ -68,7 +68,7 @@
       };
     };
     nixosModules = rec {
-      default = mudras;
+      # default = mudras;
       mudras = {
         lib,
         config,
