@@ -9,7 +9,10 @@
     nix-std.url = "github:chessai/nix-std";
   };
 
-  mudras.aspects = {
+  mudras.aspects.default = {
+    includes = [
+      mudras.aspects.default.policies.to-host
+    ];
     ## Add Users to admin groups.
     policies.to-host = {
       user,
@@ -27,21 +30,16 @@
         };
       };
     };
-    mudras = {
-      nixos = {...}: {
-        imports = [
-          self.nixosModules.mudras
-        ];
-      };
-      includes = [
-        mudras.aspects.policies.to-host
+    nixos = {...}: {
+      imports = [
+        self.nixosModules.mudras
       ];
     };
   };
 
   flake = {
     hmModules = rec {
-      # default = mudras;
+      default = mudras;
       mudras = {
         lib,
         config,
@@ -68,7 +66,7 @@
       };
     };
     nixosModules = rec {
-      # default = mudras;
+      default = mudras;
       mudras = {
         lib,
         config,
@@ -140,7 +138,7 @@
                 ExecStart = ''
                   ${package}/bin/mudras run ${verbosity}
                 '';
-                # WorkingDirectory = "/var/lib/mudras";
+                WorkingDirectory = "/var/lib/mudras";
                 # StandardInput = "null";
                 # StandardOutput = "journal+console";
                 # StandardError = "journal+console";

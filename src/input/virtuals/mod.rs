@@ -18,7 +18,10 @@ pub fn create_keyboard() -> Result<VirtualDevice, MudrasError> {
         .with_keys(&keys)?
         .build();
     match device {
-        Ok(device) => Ok(device),
+        Ok(device) => {
+            trace!("created virtual keybord");
+            Ok(device)
+        }
         Err(e) => {
             let message = format!("Failed to create uinput device: \nErr: {:#?}", e);
             let help = "";
