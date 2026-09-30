@@ -39,6 +39,7 @@ impl Server {
             .filter(|(_path, device)| utils::check_device_is_pointer(device))
             .collect();
 
+        debug!("creating virtual devices.");
         // Apparently, having a single uinput device with keys, relative axes and switches
         // prevents some libraries to listen to these events. The easy fix is to have separate
         // virtual devices, one for keys and relative axes (`uinput_device`) and another one

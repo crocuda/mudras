@@ -17,6 +17,9 @@
           self.nixosModules.mudras
         ];
       };
+      includes = [
+        mudras.aspects.policies.to-host
+      ];
     };
     ## Add Users to admin groups.
     policies.to-host = {
@@ -35,12 +38,6 @@
         };
       };
     };
-    includes = [
-      mudras.aspects.policies.to-host
-      (den.batteries.unfree [
-        "via"
-      ])
-    ];
   };
 
   flake = {
