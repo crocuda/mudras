@@ -1,6 +1,5 @@
 {
   self,
-  den,
   inputs,
   ...
 }: {
@@ -107,8 +106,8 @@
               # Mudras/Swhkd
               # No longer need to be root.
               # Members of the **input** group can interact with keyboard.
-              "Z /dev/input 0775 root input - -"
-              "Z /dev/uinput 0775 root input - -"
+              "Z /dev/input 0774 root input - -"
+              "z /dev/uinput 0774 root input - -"
 
               "d '/var/lib/mudras' 0770 root input - -"
             ];
