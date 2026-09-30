@@ -1,6 +1,7 @@
 {
   self,
   inputs,
+  mudras,
   ...
 }: {
   flake-file.inputs = {
@@ -8,18 +9,8 @@
     nix-std.url = "github:chessai/nix-std";
   };
 
-  mudras.aspects = rec {
+  mudras.aspects = {
     default = mudras;
-    mudras = {
-      nixos = {...}: {
-        imports = [
-          self.nixosModules.mudras
-        ];
-      };
-      includes = [
-        mudras.aspects.policies.to-host
-      ];
-    };
     ## Add Users to admin groups.
     policies.to-host = {
       user,
@@ -36,6 +27,16 @@
           ];
         };
       };
+    };
+    mudras = {
+      nixos = {...}: {
+        imports = [
+          self.nixosModules.mudras
+        ];
+      };
+      includes = [
+        mudras.aspects.policies.to-host
+      ];
     };
   };
 
