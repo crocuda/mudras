@@ -10,7 +10,6 @@
   };
 
   mudras.aspects = {
-    default = mudras;
     ## Add Users to admin groups.
     policies.to-host = {
       user,
