@@ -11,7 +11,7 @@
 
   mudras.aspects.default = {
     includes = [
-      mudras.aspects.default.policies.to-host
+      # mudras.aspects.default.policies.to-host
     ];
     ## Add Users to admin groups.
     policies.to-host = {
@@ -32,7 +32,13 @@
     };
     nixos = {...}: {
       imports = [
-        self.nixosModules.mudras
+        self.nixosModules.default
+      ];
+      services.mudras.enable = true;
+    };
+    homeManager = {...}: {
+      imports = [
+        self.hmModules.default
       ];
     };
   };
