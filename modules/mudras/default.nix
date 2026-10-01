@@ -128,6 +128,7 @@
               after = [
                 # "graphical-session.target"
                 "niri.service"
+                "ssh-agent.service"
               ];
               wantedBy = [
                 "niri.service"
@@ -144,15 +145,24 @@
                     config.services."mudras".logLevel
                   };
               in {
-                Type = "simple";
+                Type = "notify";
                 KillMode = "process";
                 # User = "root";
                 # Group = "input";
+
+                Slice = "session.slice";
+                ## FIX: SSH_AUTH_SOCK not in env vars
+                # ExecStartPre = ''
+                #   systemctl --user import-environment SSH_AUTH_SOCK
+                # '';
+
                 ExecStart = let
                   name = "mudras-env-wrapper";
                   text = ''
                     set -e
-                    PATH="/run/wrappers/bin:$HOME/.cargo/bin:$HOME/.bun/bin:/run/current-system/sw/bin:/nix/profile/bin:$HOME/.nix-profile/bin:$PATH"
+                    PATH="/run/wrappers/bin:$HOME/.cargo/bin:$HOME/.bun/bin:/run/current-system/sw/bin:/nix/profile/bin:$HOME/.local/state/nix/profile/bin:/etc/profiles/per-user/$USER/bin:/nix/var/nix/profiles/default/bin:/nix/profile/bin:$HOME/.nix-profile/bin:$PATH"
+                    USER_UID="$(${pkgs.coreutils}/bin/id -u $USER)"
+                    SSH_AUTH_SOCK="/run/user/$USER_UID/ssh-agent"
                     ${package}/bin/mudras run ${verbosity}
                   '';
                   script = pkgs.writeShellScriptBin name text;
