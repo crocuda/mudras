@@ -63,12 +63,14 @@ pub enum KeyState {
 pub struct SubmapState {
     pub submaps: Submaps,
     pub current: String,
+    pub last: String,
 }
 impl Default for SubmapState {
     fn default() -> Self {
         Self {
             submaps: HashMap::new(),
             current: "main".to_owned(),
+            last: "main".to_owned(),
         }
     }
 }

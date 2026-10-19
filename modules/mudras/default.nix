@@ -193,6 +193,7 @@
               package
               ## Keyboard utils
               wev
+              evtest
             ];
           };
       };

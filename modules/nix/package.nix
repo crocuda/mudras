@@ -13,10 +13,10 @@
     system,
     ...
   }: {
-    _module.args.pkgs = import self.inputs.nixpkgs {
+    _module.args.pkgs = lib.mkDefault (import self.inputs.nixpkgs {
       inherit system;
       overlays = [inputs.rust-overlay.overlays.default];
-    };
+    });
     packages = rec {
       default = mudras;
       mudras = pkgs.rustPlatform.buildRustPackage rec {

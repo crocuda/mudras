@@ -83,9 +83,11 @@ impl Server {
                                 _ => KeyState::Undefined,
                             };
                             match key_state {
+                                KeyState::Undefined => {
+                                    trace!("key={:#?},state={:#?}", keycode, key_state);
+                                }
                                 KeyState::Pressed | KeyState::Released => {
                                     trace!("key={:#?},state={:#?}", keycode, key_state);
-
                                     if let Some(keyboard_state) = keyboard_states.get_mut(&path) {
                                         // Update keyboard representation state.
                                         keyboard_state.previous = keyboard_state.current.clone();
